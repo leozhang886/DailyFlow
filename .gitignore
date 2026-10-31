@@ -1,0 +1,66 @@
+# Android/Gradle build output and local tool state
+**/build/
+**/.gradle*/
+**/.kotlin/
+**/.android/
+**/.build-home/
+**/.idea/
+**/.vscode/
+*.iml
+**/local.properties
+**/toolchain.local.json
+**/.library-identity.json
+*.hprof
+*.log
+*.tmp
+*.partial
+
+# Local delivery archives, databases and binary application packages
+deliverables/
+evidence/
+verified-sources/
+prepared-docs/
+*.apk
+*.apks
+*.xapk
+*.aab
+*.dex
+*.zip
+*.7z
+*.rar
+*.db
+*.db-*
+*.sqlite*
+*.bak
+
+# Credentials, signing material and private configuration
+.env
+.env.*
+**/.env
+**/.env.*
+**/auth.json
+**/credentials.json
+**/client_secret*.json
+**/service-account*.json
+**/secrets/
+*.keystore
+*.jks
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+*.properties.private
+
+# Third-party research and reverse-engineering artifacts
+reference/
+reverse-engineering/
+decompiled/
+rea-output/
+REA/
+third-party-apks/
+
+# Other binary JARs need review; the original Gradle Wrapper must remain tracked.
+*.jar
+!/gradle/wrapper/gradle-wrapper.jar

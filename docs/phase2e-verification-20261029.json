@@ -1,0 +1,279 @@
+{
+  "application": {
+    "version": "0.4.0-ui-polish",
+    "version_code": 5,
+    "package": "com.dailyflow.app",
+    "min_sdk": 26,
+    "target_sdk": 35,
+    "internet_permission": false
+  },
+  "verification_evidence_date": "2026-10-29",
+  "archival_preparation_reran_tests": false,
+  "toolchain": {
+    "gradle": "8.9",
+    "jdk": "21.0.12.1",
+    "android_gradle_plugin": "8.7.3",
+    "kotlin": "2.0.21",
+    "sdk": 35
+  },
+  "test_totals": {
+    "tests": 181,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 181
+  },
+  "suites": [
+    {
+      "name": "com.dailyflow.app.data.MetadataRepositoryTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.data.PlanningRepositoryTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.data.RoomTaskRepositoryTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.data.TaskUiDatabaseIntegrationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.domain.RecurrenceEngineTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.FoundationActivityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.AdaptiveUiTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.CoreComposeInteractionTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.DailyViewModelTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.DraftRegistryRestorationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.NavigationExperienceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.PlanningComposeTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.PlanningViewModelTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.TaskInteractionViewModelTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.ui.UiExperienceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.widget.WidgetHostTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.widget.WidgetPresentationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.dailyflow.app.widget.WidgetRepositoryTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "historical_case_comparison": {
+    "missing": [],
+    "added": []
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 18,
+    "by_id": {
+      "UnusedAttribute": 2,
+      "GradleDependency": 14,
+      "Overdraw": 2
+    },
+    "added": [],
+    "removed": [],
+    "report_fresh": true
+  },
+  "execution_exit_codes": {
+    "online_dependency_check": 0,
+    "full_test_lint_apk": 0,
+    "offline_dependency_check": 1
+  },
+  "offline_status": {
+    "resolved": false,
+    "dependency": "androidx.lifecycle:lifecycle-livedata:2.8.7",
+    "artifact_content_matches_cached_metadata": true,
+    "deeper_cache_association_cause": "unconfirmed"
+  },
+  "rebuilt_apk": {
+    "bytes": 11284969,
+    "sha256": "8ce27d72afd399158412a49b394428b5dcc6da05d16dd5411decf470a770c6a9",
+    "historical_apk_sha256": "e0f407e7bd58beeac8579583f1631f151984be3247d3f469cd5503ee4f0f05d3",
+    "byte_identical_to_history": false,
+    "has_internet_permission": false
+  },
+  "signing_certificate_sha256": "f7502fdfc74a6d3206ddf9646c37a65fb778675d5c89e8331b7147b0f4db0ff2",
+  "same_zip_payload_files_as_historical_apk": true,
+  "code_build_and_schema_sha256": {
+    "settings.gradle.kts": "88ce74fa7aee3c1c810e8ee9235f0a51453f2ec5f9064018e3762d4004b9688e",
+    "build.gradle.kts": "795b5a8e9889cfcfa1e63dba93d57645ef60cab5a8d19de1524aac5331764412",
+    "gradle.properties": "3296e4287e6e8fdc3f172a1eb5f6b34fff663d7e35c28b22a36f0139697f11bd",
+    "gradlew": "a4c756a0253f114a26e0e7d7e283a7c99d62c1c092b62682e9b1b72b6579b700",
+    "gradlew.bat": "4d3aefaf1e49bb978e8b266c3ce50f4553e4f0e151484b64d9d281eead0f675c",
+    "app/build.gradle.kts": "4b3d31164069427c2abc3aef1d8292f4b55aec67e5d9bfe495412577ec75da93",
+    "app/src/main/AndroidManifest.xml": "c208c53e117aebb9c383b91c3faed1fe521e78f0728793a8500338cf66cfc513",
+    "app/src/test/java/com/dailyflow/app/FoundationActivityTest.kt": "6da24abd53ab271ad3151e36eff6d771f6f3ea3f292544da9e9d0578cd0f3e82",
+    "app/src/test/java/com/dailyflow/app/data/MetadataRepositoryTest.kt": "e4e319d9cab70a5b66099e49409fa6b7ba9f552acf8801e5f5c3db1387dacb3b",
+    "app/src/test/java/com/dailyflow/app/data/PlanningRepositoryTest.kt": "1174627a23eb8ec302074f0f395320462ce8e11951d10ae85d63836fb97b3480",
+    "app/src/test/java/com/dailyflow/app/data/RoomTaskRepositoryTest.kt": "bc0f65075d9e0b17a4ecbcfe4e692a951fa69b88fe6a8d519309f32253678d63",
+    "app/src/test/java/com/dailyflow/app/data/TaskUiDatabaseIntegrationTest.kt": "1616634d2c9b7984be1b414f78bdeac65c87642275e53c8aa419c24da3acebda",
+    "app/src/test/java/com/dailyflow/app/domain/RecurrenceEngineTest.kt": "9e658c7a8c20674388da77b5cfd6e8fd46ce861438fce56013a633bd4fa2f29f",
+    "app/src/test/java/com/dailyflow/app/ui/AdaptiveUiTest.kt": "ffa561c410f5af1aa2469b3168687975ea862cb639b85465e728735e9e28aceb",
+    "app/src/test/java/com/dailyflow/app/ui/CoreComposeInteractionTest.kt": "e7ac62ed8140cde9011ebd268201b8b83e8238fe10edc39ef73a2b6ccaf2874a",
+    "app/src/test/java/com/dailyflow/app/ui/DailyViewModelTest.kt": "db529b41dfd409dcc1a826afe40d3a5d7e4abb9dfaf0ed1b032dcbbe51b9764d",
+    "app/src/test/java/com/dailyflow/app/ui/DraftRegistryRestorationTest.kt": "43eebcb13a277abdadf114af7b9e239e6631dc0d242a9adcfed0f63ff845425f",
+    "app/src/test/java/com/dailyflow/app/ui/NavigationExperienceTest.kt": "b21054a155fba4a1ca71032c0223e13e93a538acb357fb81cc5b46eee8062ea2",
+    "app/src/test/java/com/dailyflow/app/ui/PlanningComposeTest.kt": "de2b3765e2d3e6cf1d2b548e8c548aa5521dad4da8717cbd2a3c3a41d2b8eb7c",
+    "app/src/test/java/com/dailyflow/app/ui/PlanningViewModelTest.kt": "b421b322227b77cf533c66f7a6bc33e0f0149f4efdce4aef2b8f582c2478bad2",
+    "app/src/test/java/com/dailyflow/app/ui/TaskInteractionViewModelTest.kt": "b7c0913a5954228aa2702a07e48a6e262c2243d7676c1c35893e29b6b512bc31",
+    "app/src/test/java/com/dailyflow/app/ui/UiExperienceTest.kt": "867a9efe90eade9954624ba11e4b2a21914aa726030011c4f38d8f02a39f2e64",
+    "app/src/test/java/com/dailyflow/app/widget/WidgetHostTest.kt": "d78109090dd9384dc587e15b2003e180551046e899a2d422734fd28d878eb6b9",
+    "app/src/test/java/com/dailyflow/app/widget/WidgetPresentationTest.kt": "ffe35a2e103993dbc70f204c437d27b83134377c1f27750146923f73ca74b549",
+    "app/src/test/java/com/dailyflow/app/widget/WidgetRepositoryTest.kt": "d58897c52bbad9ada59019930b086687b283259c967a4fd44db4959d47fbe5e6",
+    "app/src/main/res/drawable/ic_dailyflow.xml": "f4a7b94c7f03617035f263f647e5686310984f4cbf7b40953963fee9d85f58f8",
+    "app/src/main/res/drawable/ic_widget_done.xml": "e48458375686bc2587a2184a72242a881020739a7c83c2af4d846f293f13b1d7",
+    "app/src/main/res/drawable/ic_widget_empty.xml": "218822cec684f70cafa92026b99e403d4398704f41cc8cb9b7aceb139b15fa76",
+    "app/src/main/res/drawable/ic_widget_refresh.xml": "de70ceec50e6b85d69f22d9ca3003226e8830f6a6866afee4ed6d49110a76823",
+    "app/src/main/res/layout/widget_error.xml": "011730a0315030565eef76eb88cccd09ba5fb2c1e144a6aacbf6d6069a3281f1",
+    "app/src/main/res/layout/widget_loading.xml": "9749998929e4b5cbc548e82036e1ac280daee24f8fab7a351b60a09e3bfe3764",
+    "app/src/main/res/values/styles.xml": "15b2169e66f5d8e3534ea922f61a0d51482825d818e6b3ac8b8d87beb3e618e6",
+    "app/src/main/res/values/widget_strings.xml": "eb1d2a7c89f47597b894cd11229ab6eb0e05f46e40e117ba0d0448074e7c9f28",
+    "app/src/main/res/values-night/styles.xml": "11edc5e1031cd757fee9fbf15129d412534fd1da752b76f312959f0cb4824998",
+    "app/src/main/res/xml/daily_task_widget_info.xml": "46baf3a263f3163a318174aaebb8374e102ace0eac9e3100010f5434db04aded",
+    "app/src/main/res/xml/data_extraction_rules.xml": "cb029b35db0e976c087100424e16e14a6256b46962398887520e51508c3b5842",
+    "app/src/main/java/com/dailyflow/app/DailyFlowApplication.kt": "b7b485e89468be34999c0b2fe358132afb1e1d2e8400231e4cdf3c14214d4bbe",
+    "app/src/main/java/com/dailyflow/app/MainActivity.kt": "4f40dff7e54b667a99c5f4ceafdd5a77c19a623c27301172f4fd7d6c93de9eeb",
+    "app/src/main/java/com/dailyflow/app/data/DailyFlowDatabase.kt": "75ba4ad83c15a9b667b4a14cdb528cf84bd6d1a9f8aa23002b6ae04ebb6ed3f6",
+    "app/src/main/java/com/dailyflow/app/data/Entities.kt": "a8af0e9e3907b6a3b250b48c3bb4506c64497e8225d15fad84775a129cc62c08",
+    "app/src/main/java/com/dailyflow/app/data/RoomTaskRepository.kt": "7dd7ade3fa523ea3aa13224c1c057e064e61c053f195deba2105579b649ce06b",
+    "app/src/main/java/com/dailyflow/app/data/TaskDao.kt": "5b0a2b841680401d2eee7cd48a2b36dd2196abb95606659e5c60744025c710b6",
+    "app/src/main/java/com/dailyflow/app/data/UpdatingTaskRepository.kt": "7415fb6e180551198cf1e85104fbb0267c0549f19372163985ac904df7958836",
+    "app/src/main/java/com/dailyflow/app/domain/Models.kt": "3db905f2fb4dcb006a89adb21c1fbb39a78bb75002a8ba14dcb358032eaba869",
+    "app/src/main/java/com/dailyflow/app/domain/RecurrenceEngine.kt": "463c54c2ac5b61abe4b1b74a47c2c4271512dc4f9bb79932374e47444434506f",
+    "app/src/main/java/com/dailyflow/app/domain/TaskRepository.kt": "ab9443343751e8b1163471d4c56d62b16ad6620f4ccf90b9dad156f02833ca26",
+    "app/src/main/java/com/dailyflow/app/ui/DailyViewModel.kt": "b30869813f16bc2f806f46f666aa27fecd5bc69d227a79a58f9cca73a9ad33c3",
+    "app/src/main/java/com/dailyflow/app/ui/DraftStateCodec.kt": "b54ab658f9faab186d22ac18b12795afa228c7bc94f2edd95f274c2a0c1607a9",
+    "app/src/main/java/com/dailyflow/app/ui/FlowIcons.kt": "9dcb134ace99d5fcff3708cd3d9e61c7cc608de66f4308f9c18dde5885aafb07",
+    "app/src/main/java/com/dailyflow/app/ui/FlowTheme.kt": "f6a9d0c2240cacc81dddc24c6d4a554c149b921342d8481331c9117b11d4bee9",
+    "app/src/main/java/com/dailyflow/app/ui/PlanningScreens.kt": "a9732c745ceb63799d3ecd49de2336cbc06d20841cbc456ec9e8f3e7bf11e5d5",
+    "app/src/main/java/com/dailyflow/app/ui/PlanningState.kt": "2f55fec7ef1dd39d7fdcc4a043ef30e58abcbbc93ef0ed756c4075a50671f1a3",
+    "app/src/main/java/com/dailyflow/app/ui/PlanningViewModel.kt": "853e18265a51d0d6dce00a81325b71dd1f9ba1f3960f107fbeb0ccdcaea237a2",
+    "app/src/main/java/com/dailyflow/app/ui/TaskDialogs.kt": "25c9dd27a421152472936339bf2702c7cbe7263f6c251837d4f2fe6877ef5fc0",
+    "app/src/main/java/com/dailyflow/app/ui/TaskInteractionState.kt": "8b2d2354d127b9524f2cc758126b6d40875b7d51196efc3279ce96d69b997338",
+    "app/src/main/java/com/dailyflow/app/ui/TaskScreens.kt": "58ffcc1c2ed0e3adb0eff99e88261cf0b041290e02137d143b1d54a0b24e08ba",
+    "app/src/main/java/com/dailyflow/app/widget/DailyTaskWidget.kt": "bd7d4e269ea7c78477b07c8baff8315ccda247c76fb791ccad4f6a4d60c7f49c",
+    "app/src/main/java/com/dailyflow/app/widget/WidgetActions.kt": "10dfe1ca2415a120e4c4c40ba1e92907bf0cf0917eb73bc88d9d2d2893f1e5c6",
+    "app/src/main/java/com/dailyflow/app/widget/WidgetController.kt": "a46b5f27d9b0fb647f2c1e028f6027e1aaa5433f3a30321ce2178fb8f8b2b161",
+    "app/src/main/java/com/dailyflow/app/widget/WidgetLayoutPolicy.kt": "bb64e156dd893147838b6c14ff060836477594711786f8af516dc2ff87007464",
+    "app/src/main/java/com/dailyflow/app/widget/WidgetUpdates.kt": "896d458fc8c5b6c8506a271c5392551bdc7e99a3aefcc9bb45b53d81156a59da",
+    "app/src/hostRenderProbe/java/com/dailyflow/app/ui/HostRenderingProbe.kt": "f2ce5e3e05ff8264fa229c04ba96056f8c4b349cd3bfff021a9402e2c8d65b4c",
+    "app/schemas/com.dailyflow.app.data.DailyFlowDatabase/1.json": "d169144c27fffd36c200b1cfc001e8c5bf18ebbd161723da51b27f445d86417b",
+    "app/schemas/com.dailyflow.app.data.DailyFlowDatabase/2.json": "cb174c72d4c4c38dfba92af9760dcf3d4bd02317ff5c39aa4f3efaeab8b6745c",
+    "app/schemas/com.dailyflow.app.data.DailyFlowDatabase/3.json": "8315cf7136d3a3098286f72ceb9fa28dcebff6fe75a88509ca0bb8e09ff926cd",
+    "app/schemas/com.dailyflow.app.data.DailyFlowDatabase/4.json": "207a797138ec9cbcd79e49e606f1c9f3995333e166cee85c42abfd86f777173b",
+    "gradle/wrapper/gradle-wrapper.jar": "498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17",
+    "gradle/wrapper/gradle-wrapper.properties": "40ad196c886842d44adb88e1c64445c55720cf0855fa0c5585f35449e7fc2385"
+  },
+  "raw_evidence_sha256": {
+    "01-execution.json": "8d93b97a5f2e7831d161589da7c85780ab2012b154252812b57cba51090769fd",
+    "02-execution.json": "25a1f8406609750859ab3694d1f6abcc2fc82620cd06bc36578c520c03b0db97",
+    "03-execution.json": "deea1754f512bebfc36b047ccdb7eaa95b220c557f3cbf259de93d964e6b89a4",
+    "test-summary.json": "edd16fbc019862b6c0b8f7dae0ca445d9ea2bd99c4b881ea35eff6f9e9c3ced1",
+    "lint-apk-verification.json": "9aee1570d101150882ee90f1ed66eb009988fe2d18c40ad8ce1aa1bfd8cb9349",
+    "postcheck.json": "ceeea0d7b7d74efcc483053dab8e1b88c4d828bb0991985ec3ec7c27d7ee4ee7",
+    "apk-rebuild-comparison.json": "a925b17bd8d06c3b2abc411707b0ef42a802847b8bca5c7ea509acc141fd80cf",
+    "apk-container-layout.json": "ebbb8f84f66ecace9e4d331d2306018e4673126705e6adb9ec39a6273b7549cc",
+    "01-online-dependency-recovery.log": "8697296aed999a9ceffa941c4c5e50367d82f387fd4c67a7a7894abf0a4cc84b",
+    "02-full-baseline-revalidation.log": "b364cc65b96733016d744ede8156a4173ecc8c82d29fdd040317484abd00f1b6",
+    "03-offline-dependency-check.log": "868ed19f3a012602b6e95625ed55cdf18cd73f9640f7bc207b75c6fd4f8838c9"
+  },
+  "device_validation": {
+    "phone_connected": false,
+    "adb_executed": false,
+    "emulator_executed_for_archival": false,
+    "hyperos_compatibility_verified": false
+  }
+}

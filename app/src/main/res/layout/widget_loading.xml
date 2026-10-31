@@ -1,0 +1,1 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="20dp" android:gravity="center" android:background="?android:attr/colorBackground" android:textColor="?android:attr/textColorPrimary" android:text="@string/widget_loading" />
