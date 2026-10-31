@@ -85,6 +85,10 @@ data class DailyTaskRow(
     val scheduledMinuteOverride: Int?,
     val timeOverridden: Boolean?,
     val priorityOverride: Priority?,
+    val reminderEnabled: Boolean? = null,
+    val reminderMinute: Int? = null,
+    val reminderOffset: Int? = null,
+    val reminderDeliveryStatus: String? = null,
 )
 
 @Entity(tableName = "recurrence_versions", primaryKeys = ["taskId", "effectiveFrom"], foreignKeys = [ForeignKey(

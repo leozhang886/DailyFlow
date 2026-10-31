@@ -36,7 +36,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DailyFlowApp(model: DailyViewModel, planner: PlanningViewModel) {
+internal fun DailyFlowContent(model: DailyViewModel, planner: PlanningViewModel) {
     val pageStates=rememberSaveableStateHolder()
     val planning by planner.state.collectAsStateWithLifecycle()
     if(planning.page!=null) { pageStates.SaveableStateProvider("planning") { PlanningScreen(planner) { planner.openHistoryDetails();model.selectDate(it.date);model.openDetails(it) } };return }
@@ -122,6 +122,7 @@ private fun DayList(day:DayUiState,pending:Set<String>,model:DailyViewModel,cale
             }}
         }
         item("organize"){TaskOrganizationControls(day,model,reordering){reordering=it}}
+        if(day.tasks.any{it.reminder?.enabled==true})item("reminderPermissions"){ReminderPermissionPanel()}
         if(canReorder)item("globalOrderNotice"){NoticeCard("全局顺序：在同一完成分组内上移或下移；其他日期的同一任务也会沿用。",action={TextButton(onClick={reordering=false}){Text("结束调整")}})}
         day.error?.let{error->item("error"){NoticeCard(error,error=true,action={
             if(day.readFailed)TextButton(onClick=model::retryDay){Text("重试加载")}else TextButton(onClick=model::dismissActionError){Text("关闭提示")}
@@ -175,6 +176,7 @@ internal fun TaskCard(task:TaskOccurrence,pending:Boolean,onOpen:()->Unit,onComp
                 FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
                     StatusPill(timeLabel(task.scheduledMinute))
                     StatusPill(priorityLabel(task.priority),error=task.priority==Priority.HIGH)
+                    ReminderBadge(task)
                     if(task.recurring)StatusPill("重复",emphasis=true)
                     if(task.overridden)StatusPill("仅此日")
                 }
@@ -199,6 +201,7 @@ private fun TaskDetails(task:TaskOccurrence,ui:TaskInteractionState,model:DailyV
         Card(Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
             SectionTitle("备注");Text(task.note.ifEmpty{"暂无备注"},style=MaterialTheme.typography.bodyLarge)
         }}
+        ReminderDetail(task)
         OutlinedButton(onClick={model.requestDelete(task)},enabled=actionsEnabled,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("deleteTask"),colors=ButtonDefaults.outlinedButtonColors(contentColor=MaterialTheme.colorScheme.error)){Text("删除任务")}
         if(ui.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
     }
@@ -237,6 +240,7 @@ private fun TaskEditor(editor:EditorState,ui:TaskInteractionState,model:DailyVie
                 DayOfWeek.entries.forEach{d->FilterChip(selected=d in draft.rule.weekdays,onClick={model.toggleWeekday(d)},enabled=!ui.busy,label={Text(weekdayLabel(d))},modifier=Modifier.heightIn(min=48.dp))}
             }
         }else Text(ruleLabel(draft.rule),color=MaterialTheme.colorScheme.onSurfaceVariant)
+        ReminderEditorControls(editor,model,!ui.busy)
         editor.validationError?.let{NoticeCard(it,error=true,modifier=Modifier.testTag("validationError"))}
         ui.error?.let{NoticeCard(it,error=true)}
         Spacer(Modifier.height(12.dp))

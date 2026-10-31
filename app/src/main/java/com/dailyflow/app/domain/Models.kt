@@ -53,6 +53,8 @@ data class TaskOccurrence(
     val stateRevision: Long = 0,
     val sortOrder: Long = 0,
     val createdAt: Long = 0,
+    val reminder: ReminderSetting? = null,
+    val reminderDeliveryStatus: String? = null,
 )
 
 /** UI write model. Time is display-only in 2C, not an alarm. */
@@ -63,6 +65,8 @@ data class TaskDraft(
     val scheduledMinute: Int? = null,
     val priority: Priority = Priority.NORMAL,
     val rule: RecurrenceRule? = null,
+    val reminder: ReminderSetting? = null,
+    val reminderEdited: Boolean = false,
 ) {
     fun validate(allowOutOfRuleDate: Boolean = false) {
         validateContent(title.trim(), note)
@@ -79,3 +83,8 @@ data class RuleChange(val effectiveFrom: LocalDate, val rule: RecurrenceRule)
 data class SeriesSummary(val taskId: String, val title: String, val startDate: LocalDate, val rule: RecurrenceRule,
     val revision: Long, val changes: List<RuleChange> = emptyList())
 data class TaskException(val taskId: String, val date: LocalDate, val deleted: Boolean, val title: String?)
+
+/** Local wall-clock time relative to the occurrence date, never a persisted UTC timestamp. */
+data class ReminderSetting(val enabled: Boolean = false, val minute: Int = 480, val offsetDays: Int = 0) {
+    init { require(minute in 0..1439); require(offsetDays in -3652059..3652059) }
+}

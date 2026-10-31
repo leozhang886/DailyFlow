@@ -10,12 +10,17 @@ SELECT t.*, COALESCE(v.taskId,r.taskId) AS rule_taskId, COALESCE(v.frequency,r.f
        CASE WHEN v.taskId IS NULL THEN r.untilDate ELSE v.untilDate END AS rule_untilDate,
        COALESCE(v.effectiveFrom,t.startDate) AS ruleAnchor, s.completed AS dayCompleted,
        e.taskId AS exceptionId, e.titleOverride, e.noteOverride,
-       e.scheduledMinuteOverride, e.timeOverridden, e.priorityOverride
+       e.scheduledMinuteOverride, e.timeOverridden, e.priorityOverride,
+       COALESCE(ro.enabled,rr.enabled) AS reminderEnabled, COALESCE(ro.minute,rr.minute) AS reminderMinute,
+       COALESCE(ro.offsetDays,rr.offsetDays) AS reminderOffset, rd.status AS reminderDeliveryStatus
 FROM tasks t
 LEFT JOIN recurrence_rules r ON r.taskId = t.id
 LEFT JOIN recurrence_versions v ON v.taskId=t.id AND v.effectiveFrom=(SELECT MAX(v2.effectiveFrom) FROM recurrence_versions v2 WHERE v2.taskId=t.id AND v2.effectiveFrom<=:date)
 LEFT JOIN task_day_states s ON s.taskId=t.id AND s.date=:date
 LEFT JOIN task_exceptions e ON e.taskId=t.id AND e.date=:date
+LEFT JOIN reminder_rules rr ON rr.taskId=t.id
+LEFT JOIN reminder_overrides ro ON ro.taskId=t.id AND ro.date=:date
+LEFT JOIN reminder_deliveries rd ON rd.taskId=t.id AND rd.date=:date
 WHERE t.startDate<=:date AND (t.startDate=:date OR r.taskId IS NOT NULL OR s.taskId IS NOT NULL OR e.taskId IS NOT NULL)
   AND COALESCE(e.deleted,0)=0
 ORDER BY t.sortOrder,t.createdAt,t.id
@@ -27,7 +32,7 @@ interface TaskDao {
     @Query("SELECT MAX(sortOrder) FROM tasks") suspend fun maximumSortOrder(): Long?
     @Query("UPDATE tasks SET sortOrder=:position WHERE id=:id AND sortOrder!=:position")
     suspend fun updateSortOrder(id: String, position: Long): Int
-    @Query("SELECT (SELECT COUNT(*) FROM tasks)+(SELECT COUNT(*) FROM recurrence_rules)+(SELECT COUNT(*) FROM recurrence_versions)+(SELECT COUNT(*) FROM task_day_states)+(SELECT COUNT(*) FROM task_exceptions)") fun observePlanningSignal(): Flow<Int>
+    @Query("SELECT (SELECT COUNT(*) FROM tasks)+(SELECT COUNT(*) FROM recurrence_rules)+(SELECT COUNT(*) FROM recurrence_versions)+(SELECT COUNT(*) FROM task_day_states)+(SELECT COUNT(*) FROM task_exceptions)+(SELECT COUNT(*) FROM reminder_rules)+(SELECT COUNT(*) FROM reminder_overrides)+(SELECT COUNT(*) FROM reminder_deliveries)") fun observePlanningSignal(): Flow<Int>
     @Query("SELECT t.* FROM tasks t INNER JOIN recurrence_rules r ON r.taskId=t.id ORDER BY t.createdAt,t.id") suspend fun allSeries(): List<TaskEntity>
     @Query("SELECT * FROM recurrence_versions WHERE taskId=:id AND effectiveFrom<=:date ORDER BY effectiveFrom DESC LIMIT 1") suspend fun version(id: String,date: LocalDate): RecurrenceVersionEntity?
     @Query("SELECT * FROM recurrence_versions WHERE taskId=:id ORDER BY effectiveFrom") suspend fun versions(id: String): List<RecurrenceVersionEntity>

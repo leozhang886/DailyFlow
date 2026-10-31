@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.dailyflow.app.domain.*
+import com.dailyflow.app.reminders.ReminderDeviceClock
+import com.dailyflow.app.reminders.reminderTime
 import java.time.Clock
 import java.time.LocalDate
 import kotlinx.coroutines.CancellationException
@@ -20,7 +22,7 @@ data class DayUiState(val date: LocalDate, val tasks: List<TaskOccurrence> = emp
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DailyViewModel(private val repository: TaskRepository, private val clock: Clock = Clock.systemDefaultZone(), private val saved: SavedStateHandle = SavedStateHandle()) : ViewModel() {
+class DailyViewModel(private val repository: TaskRepository, private val clock: Clock = ReminderDeviceClock(), private val saved: SavedStateHandle = SavedStateHandle()) : ViewModel() {
     private val selected = MutableStateFlow(runCatching { LocalDate.parse(saved.get<String>("selectedDate")) }.getOrElse { LocalDate.now(clock) })
     private val actionError = MutableStateFlow<String?>(null)
     private val refresh = MutableStateFlow(0)
@@ -89,6 +91,21 @@ class DailyViewModel(private val repository: TaskRepository, private val clock: 
         }
         mutableInteraction.value = TaskInteractionState(); today()
     }
+    fun openReminderTask(taskId: String, date: LocalDate) {
+        if (interaction.value.busy || interaction.value.editor?.dirty == true) {
+            mutableInteraction.value = interaction.value.copy(error = "请先保存或取消当前编辑，再打开提醒")
+            return
+        }
+        selectDate(date)
+        viewModelScope.launch {
+            try {
+                val task = repository.observeDay(date).first().firstOrNull { it.taskId == taskId && !it.completed }
+                mutableInteraction.value = if (task != null) TaskInteractionState(page = TaskPage.DETAILS, detail = task)
+                    else TaskInteractionState(message = "该提醒对应任务已完成、删除或不再有效")
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { mutableInteraction.value = TaskInteractionState(error = "无法读取提醒对应任务，请重试") }
+        }
+    }
     fun openWidgetTask(taskId: String, date: LocalDate) {
         if (interaction.value.busy || interaction.value.editor?.dirty == true) {
             mutableInteraction.value = interaction.value.copy(error = "请先保存或取消当前编辑，再打开桌面任务")
@@ -118,6 +135,15 @@ class DailyViewModel(private val repository: TaskRepository, private val clock: 
     fun setNote(note: String) = changeDraft { it.copy(note = note) }
     fun setTime(minute: Int?) = changeDraft { it.copy(scheduledMinute = minute) }
     fun setPriority(priority: Priority) = changeDraft { it.copy(priority = priority) }
+    fun setReminderEnabled(enabled: Boolean) = changeDraft { draft ->
+        val next = clock.instant().atZone(clock.zone).plusHours(1).withSecond(0).withNano(0)
+        val series = draft.rule != null && (interaction.value.editor?.taskId == null || interaction.value.editor?.scope == EditScope.SERIES)
+        val default = ReminderSetting(false, if (draft.date <= next.toLocalDate()) next.hour * 60 + next.minute else 480,
+            if (series) 0 else java.time.temporal.ChronoUnit.DAYS.between(draft.date, next.toLocalDate()).coerceAtLeast(0).toInt())
+        draft.copy(reminder = (draft.reminder ?: default).copy(enabled = enabled), reminderEdited = true)
+    }
+    fun setReminderMinute(minute: Int) = changeDraft { it.copy(reminder = (it.reminder ?: ReminderSetting()).copy(enabled=true,minute=minute), reminderEdited=true) }
+    fun setReminderDate(date: LocalDate) = changeDraft { it.copy(reminder = (it.reminder ?: ReminderSetting()).copy(enabled=true,offsetDays=java.time.temporal.ChronoUnit.DAYS.between(it.date,date).toInt()), reminderEdited=true) }
     fun setEditorDate(date: LocalDate) {
         if (interaction.value.editor?.dateLocked == true) return
         changeDraft { it.copy(date = date) }
@@ -126,7 +152,7 @@ class DailyViewModel(private val repository: TaskRepository, private val clock: 
         if (interaction.value.editor?.taskId != null) return
         changeDraft { draft -> draft.copy(rule = frequency?.let {
             RecurrenceRule(it, weekdays = if (it == Frequency.WEEKLY) setOf(draft.date.dayOfWeek) else emptySet())
-        }) }
+        }, reminder = draft.reminder?.let { if (frequency != null) it.copy(offsetDays=0) else it }) }
     }
     fun toggleWeekday(day: java.time.DayOfWeek) {
         if (interaction.value.editor?.taskId != null) return
@@ -168,7 +194,15 @@ class DailyViewModel(private val repository: TaskRepository, private val clock: 
         val current = interaction.value
         val editor = current.editor ?: return
         if (current.busy) return
-        try { editor.draft.validate(allowOutOfRuleDate=editor.taskId!=null && editor.scope==EditScope.SINGLE) }
+        try {
+            editor.draft.validate(allowOutOfRuleDate=editor.taskId!=null && editor.scope==EditScope.SINGLE)
+            val reminder = editor.draft.reminder
+            val series = editor.draft.rule != null && (editor.taskId == null || editor.scope == EditScope.SERIES)
+            if (reminder?.enabled == true && (editor.taskId == null || editor.draft.reminderEdited)) {
+                if (series) require(reminder.offsetDays == 0) { "系列提醒在每个有效实例当天" }
+                else require(reminderTime(editor.draft.date,reminder,clock.zone) > clock.instant()) { "提醒时间已过去，请选择未来时间" }
+            }
+        }
         catch (invalid: IllegalArgumentException) {
             mutableInteraction.value = current.copy(editor = editor.copy(validationError = invalid.message)); return
         }

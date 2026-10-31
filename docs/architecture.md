@@ -1,4 +1,4 @@
-# DailyFlow 0.5.0 架构与历史演进
+# DailyFlow 0.6.0 架构与历史演进
 
 ## Phase 2D 数据与导航基础
 
@@ -28,7 +28,7 @@ FlowTheme、FlowDesign 与共享 PageFrame/ActionDock/NoticeCard/StatusPill 提�
 
 ## Phase 2F 任务管理
 
-当前应用版本为 `0.5.0-task-organize`、versionCode 6，包名仍为 `com.dailyflow.app`。
+该历史阶段应用版本为 `0.5.0-task-organize`、versionCode 6，包名仍为 `com.dailyflow.app`。
 现有 `priority`、`priorityOverride`、`sortOrder`、`createdAt` 支撑新功能；Entity、schema v4、迁移链与0.4.0一致。
 HIGH/NORMAL/LOW 为新界面选项，旧 MEDIUM 存储值保留并在展示/筛选时归入普通。
 重复任务单日编辑沿用例外覆盖，系列编辑保留已有单日覆盖；详见 [数据库兼容性](database-compatibility.md)。
@@ -39,8 +39,14 @@ DAO 按主键只更新 sortOrder；不同值交换两行，同值时在事务内
 更新后仍经 UpdatingTaskRepository 请求小组件刷新，小组件不继承首页筛选/搜索条件。
 完整操作与范围见 [使用说明](phase2f-usage.md)，主机验证与设备验证的边界见 [测试说明](testing.md)。
 
-## 审计整改候选
+## 历史：0.5.0审计整改候选
 
 本轮只补全文档、纠正验证记录并增加排序核查测试，未改 Android 业务代码、依赖或数据库配置。
 三个历史链接目标连同其必要证据一起交付，避免只补直接目标而留下二级失效链接。
 本候选仍待再次独立验收；不进入Phase 2G，不宣称澎湃OS或真实桌面验证通过。
+
+## 当前Phase 2G：本地提醒
+
+DailyFlowApplication装配UpdatingTaskRepository → ReminderAwareRepository → RoomTaskRepository，前者继续刷新Glance，中间层串行化任务写入和提醒对账。Room是唯一配置源；提醒DAO与任务写入同一事务提交，系统调度在提交后执行。
+Room v5新增4张提醒表，旧表不重建。ReminderPlanner解析任务、规则版本、例外和完成状态；ReminderEngine协调唯一持久化唤醒游标、去重及重试。AndroidReminderScheduler/Notifier独立处理AlarmManager、NotificationManager，Compose只调用ViewModel和权限引导。
+原有219项测试源码未改。Schema迁移与证据见 [数据库说明](database-compatibility.md)，标识、防重和崩溃边界见 [提醒实现](phase2g-implementation.md)，操作范围见 [提醒使用](phase2g-usage.md)。

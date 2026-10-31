@@ -1,6 +1,8 @@
 package com.dailyflow.app.data
 
 import androidx.room.withTransaction
+import com.dailyflow.app.reminders.ReminderRepository
+import com.dailyflow.app.reminders.ReminderDeviceClock
 import com.dailyflow.app.domain.*
 import java.time.Clock
 import java.time.LocalDate
@@ -9,8 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-class RoomTaskRepository(private val database: DailyFlowDatabase, private val clock: Clock = Clock.systemUTC()) : TaskRepository {
+class RoomTaskRepository(private val database: DailyFlowDatabase, private val clock: Clock = ReminderDeviceClock()) : TaskRepository {
     private val dao = database.taskDao()
+    private val reminders = ReminderRepository(database, clock)
 
     private fun resolveDay(rows: List<DailyTaskRow>, date: LocalDate): List<TaskOccurrence> = rows
         .filter { RecurrenceEngine.occursOn(it.ruleAnchor,it.rule?.toDomain(),date) || it.dayCompleted==true || it.exceptionId!=null }
@@ -18,7 +21,8 @@ class RoomTaskRepository(private val database: DailyFlowDatabase, private val cl
             row.dayCompleted?:false,row.rule!=null,row.exceptionId!=null,
             if(row.timeOverridden==true)row.scheduledMinuteOverride else row.task.scheduledMinute,
             row.priorityOverride?:row.task.priority,row.rule?.toDomain(),row.task.stateRevision,
-            row.task.sortOrder,row.task.createdAt) }
+            row.task.sortOrder,row.task.createdAt,
+            row.reminderEnabled?.let { ReminderSetting(it, row.reminderMinute ?: 480, row.reminderOffset ?: 0) }, row.reminderDeliveryStatus) }
     override fun observeDay(date: LocalDate): Flow<List<TaskOccurrence>> = dao.observeDayCandidates(date).map { resolveDay(it,date) }.distinctUntilChanged()
     override fun observeSeries(): Flow<List<SeriesSummary>> = dao.observePlanningSignal().map {
         database.withTransaction { dao.allSeries().map { task -> SeriesSummary(task.id,task.title,task.startDate,
@@ -83,6 +87,7 @@ class RoomTaskRepository(private val database: DailyFlowDatabase, private val cl
             dao.insertTask(TaskEntity(id, draft.title.trim(), draft.note, draft.date, createdAt = now, updatedAt = now,
                 scheduledMinute = draft.scheduledMinute, priority = draft.priority, sortOrder = position))
             draft.rule?.let { dao.insertRule(RecurrenceRuleEntity.from(id, it)) }
+            if (draft.reminder?.enabled == true) reminders.save(id, draft.date, EditScope.SERIES, draft.rule != null, draft.reminder)
         }
         return id
     }
@@ -115,7 +120,7 @@ class RoomTaskRepository(private val database: DailyFlowDatabase, private val cl
         TaskDraft(exception?.titleOverride ?: task.title, exception?.noteOverride ?: task.note,
             if (single) date else task.startDate,
             if (exception?.timeOverridden == true) exception.scheduledMinuteOverride else task.scheduledMinute,
-            exception?.priorityOverride ?: task.priority, rule)
+            exception?.priorityOverride ?: task.priority, rule, reminder = reminders.setting(taskId, date, scope, rule != null))
     }
 
     override suspend fun updateTask(taskId: String, occurrenceDate: LocalDate, draft: TaskDraft, scope: EditScope) = database.withTransaction {
@@ -123,6 +128,7 @@ class RoomTaskRepository(private val database: DailyFlowDatabase, private val cl
         requireOccurrence(taskId, occurrenceDate)
         val task = requireNotNull(dao.task(taskId))
         val rule = if(scope==EditScope.SINGLE) dao.version(taskId,occurrenceDate)?.toDomain()?:dao.rule(taskId)?.toDomain() else dao.rule(taskId)?.toDomain()
+        val currentReminder = reminders.setting(taskId, occurrenceDate, scope, rule != null)
         require(draft.rule == rule) { "本阶段不修改既有重复规则" }
         if (rule != null) require(draft.date == if (scope == EditScope.SINGLE) occurrenceDate else task.startDate) { "重复任务日期在本阶段保持固定" }
         if (rule != null && scope == EditScope.SINGLE) {
@@ -137,6 +143,8 @@ class RoomTaskRepository(private val database: DailyFlowDatabase, private val cl
                 dao.saveDayState(oldState.copy(date = draft.date, updatedAt = clock.millis()))
             }
         }
+        if (draft.reminderEdited || (draft.reminder != null && draft.reminder != currentReminder))
+            reminders.save(taskId, if (rule != null && scope == EditScope.SINGLE) occurrenceDate else draft.date, scope, rule != null, draft.reminder)
     }
 
     private suspend fun requireOccurrence(id: String, date: LocalDate) {
