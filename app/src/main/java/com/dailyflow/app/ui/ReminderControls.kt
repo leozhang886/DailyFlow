@@ -123,13 +123,13 @@ fun reminderSummary(task:TaskOccurrence,now:Instant,zone:ZoneId):String {
     val setting=task.reminder?:return "未设置提醒"
     if(task.completed)return "提醒已结束（任务已完成）"
     if(!setting.enabled)return "提醒已关闭"
+    val time=reminderTime(task.date,setting,zone)
     when(task.reminderDeliveryStatus) {
         "DELIVERED"->return "已提醒"
         "CLAIMED"->return "提醒发送状态待核实"
-        "FAILED"->return "提醒发送失败，等待重试"
+        "FAILED"->return if(now.toEpochMilli()-time.toEpochMilli()>ReminderEngine.LATE_WINDOW) "提醒已过期（发送失败，重试已结束）" else "提醒发送失败，等待重试"
         "CANCELED"->return "本实例已提醒并结束"
     }
-    val time=reminderTime(task.date,setting,zone)
     if(time<=now)return "提醒已过期"
     return "提醒："+time.atZone(zone).format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
 }

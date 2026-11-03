@@ -45,7 +45,7 @@ class ReminderEngine(private val db: DailyFlowDatabase, private val scheduler: R
     private suspend fun safeReconcile() {
         try {
             val current = dao.alarm()
-            if (current?.state == "NOTIFY_ERROR" && current.dueAt <= clock.millis() && clock.millis() - current.dueAt <= LATE_WINDOW) dispatch(current)
+            if (current?.state in setOf("NOTIFY_ERROR", "ERROR") && current != null && current.dueAt <= clock.millis() && clock.millis() - current.dueAt <= LATE_WINDOW) dispatch(current)
             else reconcileLocked()
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) {
@@ -57,10 +57,10 @@ class ReminderEngine(private val db: DailyFlowDatabase, private val scheduler: R
         dao.saveAlarm(alarm.copy(state = state, detail = message))
         runCatching { repair(true) }
     }
-    private suspend fun reconcileLocked() {
+    private suspend fun reconcileLocked(preservePending: Boolean = true) {
         val state = snapshot(); val old = dao.alarm()
         // Only records which have not already been canceled need another system cancel.
-        for (delivery in state.deliveries.filter { it.status != "CANCELED" && it.status != "FAILED" }) {
+        for (delivery in state.deliveries.filter { it.status != "CANCELED" }) {
             val key = ReminderKey(delivery.taskId, delivery.date)
             if (state.plan(key, zone(), excludeSent = false) == null) {
                 notifier.cancel(key)
@@ -73,6 +73,19 @@ class ReminderEngine(private val db: DailyFlowDatabase, private val scheduler: R
         }
         runCatching { repair(true) }
         val now = clock.instant(); val zoneId = zone()
+        // A known pending alarm may legally arrive late. Keep its token so an in-flight
+        // broadcast remains valid; re-arm it instead of replacing it with a future cursor.
+        if (preservePending && old != null && old.state in setOf("PLANNED", "EXACT", "INEXACT") &&
+            old.dueAt <= now.toEpochMilli() && now.toEpochMilli() - old.dueAt <= LATE_WINDOW &&
+            (old.taskId == MAINTENANCE || state.candidates(now, zoneId, old.date).any { it.dueAt >= old.dueAt && it.dueAt <= now.toEpochMilli() }) &&
+            notifier.allowed()) {
+            try {
+                val mode = scheduler.schedule(old, (clock.millis() + 60_000).coerceAtMost(old.dueAt + LATE_WINDOW))
+                dao.saveAlarm(old.copy(state = mode, detail = if (mode == "INEXACT") "未获精确闹钟授权，提醒可能延迟" else ""))
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { persistFailure(old, "ERROR", "系统闹钟未注册，将自动重试") }
+            return
+        }
         val next = state.next(now, zoneId)
         val maintenance = now.atZone(zoneId).toLocalDate().plusDays(1).atTime(0, 5).atZone(zoneId).toInstant().toEpochMilli()
         val selected = next?.takeIf { it.dueAt <= maintenance }
@@ -105,12 +118,19 @@ class ReminderEngine(private val db: DailyFlowDatabase, private val scheduler: R
                 dao.saveDelivery(ReminderDeliveryEntity(plan.key.taskId, plan.key.date, clock.millis(), "CLAIMED"))
                 try {
                     notifier.post(plan)
-                    dao.saveDelivery(ReminderDeliveryEntity(plan.key.taskId, plan.key.date, clock.millis(), "DELIVERED"))
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (_: Exception) {
                     dao.saveDelivery(ReminderDeliveryEntity(plan.key.taskId, plan.key.date, clock.millis(), "FAILED"))
                     if (failed == null) failed = plan
+                    continue
                 }
+                // notify has returned. An acknowledgement failure must not turn an
+                // accepted notification into a retryable FAILED record. The durable
+                // CLAIMED record prevents replay and retains its cancellation identity.
+                try {
+                    dao.saveDelivery(ReminderDeliveryEntity(plan.key.taskId, plan.key.date, clock.millis(), "DELIVERED"))
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (_: Exception) { /* Keep CLAIMED: delivery status remains uncertain. */ }
             }
         }
         if (failed != null) {
@@ -119,7 +139,7 @@ class ReminderEngine(private val db: DailyFlowDatabase, private val scheduler: R
             scheduler.cancel(cursor); dao.saveAlarm(retry)
             runCatching { scheduler.schedule(retry, clock.millis() + 60_000) }
             runCatching { repair(true) }
-        } else reconcileLocked()
+        } else reconcileLocked(preservePending = false)
     }
     companion object {
         const val MAINTENANCE = "_dailyflow_reminder_maintenance_"
